@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Struct para salvar os contatos
+typedef struct {
+    char nome[50];
+    char telefone[20];
+    char tipoTelefone[20];
+    char email[100];
+    char dataAniversario[11];
+} Contato;
+
+Contato listaContatos[100];
+int totalContatos = 0;
+
+//Função para adcionar os contatos
+void inserirContato() {
+    if (totalContatos == 100) {
+        printf("Agenda cheia!\n");
+        return;
+    }
+    printf("Nome: ");
+    scanf(" %[^\n]%*c", listaContatos[totalContatos].nome);
+    printf("Telefone: ");
+    scanf(" %[^\n]%*c", listaContatos[totalContatos].telefone);
+    printf("Tipo de telefone (Celular, Fixo, Residência, Trabalho): ");
+    scanf(" %[^\n]%*c", listaContatos[totalContatos].tipoTelefone);
+    printf("Email: ");
+    scanf(" %[^\n]%*c", listaContatos[totalContatos].email);
+    printf("Data de Aniversário (DD/MM/AAAA): ");
+    scanf(" %[^\n]%*c", listaContatos[totalContatos].dataAniversario);
+    totalContatos++;
+}
+
+//Função para salvar em um arquivo txt
+void salvarContatos() {
+    FILE *file = fopen("agenda.dat", "wb");
+    if (file == NULL) {
+        printf("Erro ao abrir arquivo!\n");
+        return;
+    }
+    fwrite(listaContatos, sizeof(Contato), totalContatos, file);
+    fclose(file);
+    printf("Dados gravados com sucesso!\n");
+}
+
+//Função para listar os contatos
+void exibirContatos() {
+    for (int i = 0; i < totalContatos; i++) {
+        printf("Posição %d: %s, %s, %s, %s, %s\n", i + 1, listaContatos[i].nome, listaContatos[i].telefone,
+               listaContatos[i].tipoTelefone, listaContatos[i].email, listaContatos[i].dataAniversario);
+    }
+}
+
+//Função que ordena os contatos. Preferi não mostrar a lista depois de ordenada.
+void ordenarContatos() {
+    qsort(listaContatos, totalContatos, sizeof(Contato), (int (*)(const void*, const void*)) strcmp);
+    printf("Lista ordenada por nome.\n");
+}
+
+// Função para remover contato
+void removerContato() {
+    int pos;
+    exibirContatos();
+    printf("Digite a posição para remover: ");
+    scanf("%d", &pos);
+    if (pos < 1 || pos > totalContatos) {
+        printf("Posição inválida!\n");
+        return;
+    }
+    for (int i = pos - 1; i < totalContatos - 1; i++) {
+        listaContatos[i] = listaContatos[i + 1];
+    }
+    totalContatos--;
+    printf("Registro removido.\n");
+}
+
+//Função para editar algum contato
+void modificarContato() {
+    int pos;
+    exibirContatos();
+    printf("Digite a posição para modificar: ");
+    scanf("%d", &pos);
+    if (pos < 1 || pos > totalContatos) {
+        printf("Posição inválida!\n");
+        return;
+    }
+    printf("Novos dados para posição %d:\n", pos);
+    printf("Nome: ");
+    scanf(" %[^\n]%*c", listaContatos[pos - 1].nome);
+    printf("Telefone: ");
+    scanf(" %[^\n]%*c", listaContatos[pos - 1].telefone);
+    printf("Tipo de telefone (Celular, Fixo, Residência, Trabalho): ");
+    scanf(" %[^\n]%*c", listaContatos[pos - 1].tipoTelefone);
+    printf("Email: ");
+    scanf(" %[^\n]%*c", listaContatos[pos - 1].email);
+    printf("Data de Aniversário (DD/MM/AAAA): ");
+    scanf(" %[^\n]%*c", listaContatos[pos - 1].dataAniversario);
+    printf("Dados atualizados!\n");
+}
+
+//Função para mostrar o Menu. Aqui as funções são chamadas
+void mostrarMenu() {
+    int escolha;
+    do {
+        printf("\n==== Agenda de Contatos ====\n");
+        printf("1. Adicionar novo contato\n");
+        printf("2. Remover contato existente\n");
+        printf("3. Modificar contato\n");
+        printf("4. Mostrar todos os contatos\n");
+        printf("5. Ordenar contatos por nome\n");
+        printf("6. Salvar contatos em arquivo\n");
+        printf("0. Encerrar programa\n");
+        printf("Selecione uma opção: ");
+        scanf("%d", &escolha);
+        switch (escolha) {
+            case 1: inserirContato(); break;
+            case 2: removerContato(); break;
+            case 3: modificarContato(); break;
+            case 4: exibirContatos(); break;
+            case 5: ordenarContatos(); break;
+            case 6: salvarContatos(); break;
+            case 0: break;
+            default: printf("Escolha uma opção válida!\n");
+        }
+    } while (escolha != 0);
+}
+
+int main() {
+    mostrarMenu();
+    return 0;
+}
